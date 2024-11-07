@@ -9,10 +9,21 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: DotNet-3.1
     
-  #dotnet_rabbitmq:
-  #  image: rabbitmq:3-alpine
+  dotnet_rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: admin 
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
     
-  #dotnet_minio:
+    
+    #dotnet_minio:
   #  image: minio/minio:latest
     
   #dotnet_mongodb:
@@ -22,20 +33,37 @@ services:
   #  image: jaegertracing/all-in-one:latest
     
   dotnet_main:
-    image: dotnet-web
+    image: dotnet-web-main
     build:
       context: "."
       dockerfile: "Dotnet.Homeworks.MainProject/Dockerfile"
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "5065:5065"
+      - "7027:7027"
     environment:
-        ConnectionStrings__Default: "Host=database;Port=5432;Username=postgres;Password=admin;Database=DotNet-3.1"
+      ConnectionStrings__Default: "Host=database;Port=5432;Username=postgres;Password=admin;Database=DotNet-3.1"
+      ASPNETCORE_URLS: http://+:5065
+      ASPNETCORE_ENVIRONMENT: Development
     depends_on:
       - dotnet_postgres
+      - dotnet_rabbitmq
     
-  #dotnet_mailing:
-  #  image: dotnet-web
-    
+  dotnet_mailing:
+    image: dotnet-web-mailing
+    build:
+      context: "."
+      dockerfile: "Dotnet.Homeworks.Mailing.API/Dockerfile"
+    environment:
+      EmailConfig__Email: dmitriy_aleksandrov_2004@bk.ru
+      EmailConfig__Host: smtp.mail.ru
+      EmailConfig__Port: 567 # 465 / 587
+      EmailConfig__Password: VMyZr8Jz3h2a7dcaq4rh
+      ASPNETCORE_URLS: http://+:5115
+    ports:
+      - "5115:5115"
+      - "7255:7255"
+    depends_on: 
+      - dotnet_rabbitmq
+  
   #dotnet_storage:
   #  image: dotnet-web
