@@ -42,6 +42,9 @@ services:
       - "7027:7027"
     environment:
       ConnectionStrings__Default: "Host=database;Port=5432;Username=postgres;Password=admin;Database=DotNet-3.1"
+      RabbitMqConfig__Username: rabbit
+      RabbitMqConfig__Password: admin
+      RabbitMqConfig__Hostname: rabbitmq
       ASPNETCORE_URLS: http://+:5065
       ASPNETCORE_ENVIRONMENT: Development
     depends_on:
@@ -58,6 +61,9 @@ services:
       EmailConfig__Host: smtp.mail.ru
       EmailConfig__Port: 567 # 465 / 587
       EmailConfig__Password: VMyZr8Jz3h2a7dcaq4rh
+      RabbitMqConfig__Username: rabbit
+      RabbitMqConfig__Password: admin
+      RabbitMqConfig__Hostname: rabbitmq
       ASPNETCORE_URLS: http://+:5115
     ports:
       - "5115:5115"
