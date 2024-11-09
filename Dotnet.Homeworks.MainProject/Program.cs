@@ -13,12 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddMasstransitRabbitMq(new RabbitMqConfig
-{
-    Username = "rabbit",
-    Password = "admin",
-    Hostname = "rabbitmq"
-});
+builder.Services.AddMasstransitRabbitMq(
+    builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>()!);
 
 builder.Services.AddSingleton<IRegistrationService, RegistrationService>();
 builder.Services.AddSingleton<ICommunicationService, CommunicationService>();

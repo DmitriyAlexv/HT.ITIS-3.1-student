@@ -1,6 +1,7 @@
 using Dotnet.Homeworks.Mailing.API.Configuration;
 using Dotnet.Homeworks.Mailing.API.Services;
 using Dotnet.Homeworks.Mailing.API.ServicesExtensions;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -9,12 +10,8 @@ builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailC
 
 builder.Services.AddScoped<IMailingService, MailingService>();
 
-builder.Services.AddMasstransitRabbitMq(new RabbitMqConfig
-{
-    Username = "rabbit",
-    Password = "admin",
-    Hostname = "rabbitmq"
-});
+builder.Services.AddMasstransitRabbitMq(
+    builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>()!);
 
 var app = builder.Build();
 
