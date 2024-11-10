@@ -1,13 +1,25 @@
+using Dotnet.Homeworks.Data.DatabaseContext;
+using Dotnet.Homeworks.MainProject.Configuration;
 using Dotnet.Homeworks.MainProject.Services;
 using Dotnet.Homeworks.MainProject.ServicesExtensions.MediatR;
 using Dotnet.Homeworks.MainProject.ServicesExtensions.Npgsql;
+using Dotnet.Homeworks.MainProject.ServicesExtensions.Masstransit;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext(builder.Configuration);
 builder.Services.AddMediatRDefault();
+
+builder.Services.AddMasstransitRabbitMq(new RabbitMqConfig
+{
+    Username = "rabbit",
+    Password = "admin",
+    Hostname = "rabbitmq"
+});
 
 builder.Services.AddSingleton<IRegistrationService, RegistrationService>();
 builder.Services.AddSingleton<ICommunicationService, CommunicationService>();
